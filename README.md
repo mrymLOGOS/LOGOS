@@ -103,4 +103,10 @@ LOGOS has not been assessed against either standard. They are cited only to desc
 
 ## Contact
 
-[Name] آ· [email] آ· [LinkedIn]
+[MRYMLOGOS] آ·
+
+[email] آ· mrymlogos@gmail.com
+
+[LinkedIn]    www.linkedin.com/in/mrymLOGOS
+
+
