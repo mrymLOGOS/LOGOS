@@ -109,4 +109,20 @@ LOGOS has not been assessed against either standard. They are cited only to desc
 
 [LinkedIn]    www.linkedin.com/in/mrymLOGOS
 
+### Prototype 3: failure-path prediction (simulation)
 
+Simulated drives with a hidden stress level that rises slowly before a failure,
+harmless short spikes (glare, tunnels), and 25% abrupt faults with no warning.
+Alarm threshold chosen on training drives for a fixed false-alarm budget; scored on unseen drives.
+
+| Harmless spikes | Budget | Single-reading threshold | Window-trend model |
+|---|---|---|---|
+| No  | ~2 false alarms/h | 60% of failures warned | 72-73% |
+| Yes | ~2 false alarms/h | 11% | 63-65% |
+| Yes | ~6 false alarms/h | 23% | 70-72% |
+
+Reading: looking at the trend over 20 s beats a single reading when harmless spikes exist.
+A simple logistic model did about as well as boosting.
+Limits: fully synthetic data designed by us; the result partly follows from the simulator's design.
+The unwarned remainder is mostly abrupt faults, which no method can foresee.
+Real driving logs are needed to test whether this holds.
