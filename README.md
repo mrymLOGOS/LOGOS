@@ -111,18 +111,18 @@ LOGOS has not been assessed against either standard. They are cited only to desc
 
 ### Prototype 3: failure-path prediction (simulation)
 
-Simulated drives with a hidden stress level that rises slowly before a failure,
-harmless short spikes (glare, tunnels), and 25% abrupt faults with no warning.
-Alarm threshold chosen on training drives for a fixed false-alarm budget; scored on unseen drives.
+Simulated drives: a hidden stress level rises slowly before a failure, harmless short
+spikes (glare, tunnels) occur, and 25% of failures are abrupt with no warning.
+Every method is set to the same 4 false alarms per healthy hour; 5 repeats, mean (+- std).
 
-| Harmless spikes | Budget | Single-reading threshold | Window-trend model |
+| Harmless spikes | Single-reading threshold | Trend model (logistic) | Trend model (boosting) |
 |---|---|---|---|
-| No  | ~2 false alarms/h | 60% of failures warned | 72-73% |
-| Yes | ~2 false alarms/h | 11% | 63-65% |
-| Yes | ~6 false alarms/h | 23% | 70-72% |
+| No  | 71% (+-3) | 75% (+-3) | 73% (+-3) |
+| Yes | 22% (+-2) | 75% (+-3) | 74% (+-4) |
 
-Reading: looking at the trend over 20 s beats a single reading when harmless spikes exist.
-A simple logistic model did about as well as boosting.
-Limits: fully synthetic data designed by us; the result partly follows from the simulator's design.
-The unwarned remainder is mostly abrupt faults, which no method can foresee.
-Real driving logs are needed to test whether this holds.
+Reading: with harmless spikes, a single reading fails (22%) while a 20 s trend holds up (about 75%).
+Without spikes the difference is within noise. A simple logistic model matched boosting.
+The roughly 25% not warned are the abrupt faults, which no method can foresee.
+Limits: fully synthetic data that we designed, so the result partly follows from the
+simulator's assumptions. The principle (trend beats a single reading) is well known.
+Next step: test on real driving logs.
