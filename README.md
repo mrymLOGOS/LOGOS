@@ -19,7 +19,7 @@ LOGOS sits next to a driving system and keeps asking two questions: "Do I recogn
 4. **Explain:** a plain-language report says what was flagged and why.
 5. **Hand over:** a person confirms the next step while LOGOS suggests a cautious action.
 
-Current status: Sense and Doubt are built and tested (prototypes 1 and 2). Anticipate is tested in simulation and on NASA engine data (prototypes 3 and 4). Explain is a text report on the engine data. Hand over is a simulated approve/reject prompt only.
+Current status: Sense and Doubt are built and tested (prototypes 1 and 2). Anticipate is tested in simulation and on NASA engine data (prototypes 3 and 4). Prototype 5 tests whether the system can tell when its own warnings cannot be trusted. Explain is a text report on the engine data. Hand over is a simulated approve/reject prompt only.
 
 ## Experiments and results
 
@@ -74,6 +74,17 @@ NASA turbofan engine degradation data (a NASA simulation of jet engines, not car
 
 The notebook also prints an alert report: score, the three sensors that pushed it up, how far they are from early-life values, suggested action, limits, and a human approve/reject prompt (which only records the answer).
 
+### Prototype 5: does the guardian know what it does not know? (NASA C-MAPSS)
+
+The warning model is trained only on FD001 engines 1 to 80 (one kind of fault). FD003 contains a fault type FD001 does not have, according to NASA's documentation.
+
+- On engines of the known kind the warning model warned 100% of engines. On FD003 it warned only 56%, with fewer false alarms: it stayed **silent**, not noisy.
+- A separate "do I recognise this?" check (distance to what the guardian was trained on) is used live, using only data up to the current cycle. Its rule was fixed on 20 known engines never used for training (5% of them flagged), before looking at FD003.
+- Result on FD003: all 44 engines the warning model missed were flagged as unfamiliar before failure; 98% were flagged at least 60 cycles early (median 182 cycles). 11% of the engines the model did warn about were flagged too.
+- When an engine is flagged, LOGOS would say: "I do not recognise how this engine is behaving. My silence is not a good sign. A human must check."
+
+Cautions: only one pair of datasets was tested. The flag appears very early, so the check may be noticing that these engines look different from the start rather than the unseen fault itself; NASA does not label the fault type per engine, so this could not be verified. The rule was calibrated on only 20 engines. Detecting unfamiliar inputs and predicting failure are both established fields; the contribution tested here is the combination, with a human in the loop.
+
 ## Limitations
 
 - Offline testing only. No real driving footage, no live vehicle. Prototype 4 data is a NASA simulation of jet engines.
@@ -87,7 +98,7 @@ The notebook also prints an alert report: score, the three sensors that pushed i
 
 1. Real driving data: check whether the gains hold on real road imagery and real vehicle logs.
 2. Harder unknowns: unfamiliar objects that resemble familiar ones.
-3. More engine data (FD003, FD004) and confidence intervals on the comparison.
+3. Other dataset pairs for prototype 5 (FD001 to FD002 and FD004, and the reverse), repeats, and confidence intervals.
 4. Fleet layer: one vehicle's alert reaches the others in a simulation.
 5. Plain-language layer with a language model, checked against the evidence behind each alert.
 
@@ -99,14 +110,15 @@ notebooks/
   LOGOS_prototype_2_road_signs.ipynb      road-sign experiment (needs a GPU)
   LOGOS_prototype_3_failure_path.ipynb    failure-path simulation (CPU)
   LOGOS_prototype_4_real_engines.ipynb    NASA engine data + readable report (CPU)
+  LOGOS_prototype_5_knows_its_limits.ipynb  silent misses and a live 'do I recognise this?' check (CPU)
 README.md
 ```
 
 ## How to run
 
 1. Open a notebook in Google Colab (File > Upload notebook, or open from GitHub).
-2. For prototype 2, set Runtime > Change runtime type > T4 GPU. Prototypes 1, 3 and 4 run on CPU.
-3. Run all cells in order. Approximate times: prototype 1 about a minute, prototype 2 25 to 40 minutes, prototype 3 a few minutes, prototype 4 a few minutes.
+2. For prototype 2, set Runtime > Change runtime type > T4 GPU. Prototypes 1, 3, 4 and 5 run on CPU.
+3. Run all cells in order. Approximate times: prototype 1 about a minute, prototype 2 25 to 40 minutes, prototype 3 a few minutes, prototypes 4 and 5 a few minutes per step.
 
 Dependencies: numpy, pandas, matplotlib, scikit-learn, PyTorch, torchvision (all preinstalled in Colab).
 
@@ -121,4 +133,4 @@ LOGOS has not been assessed against any standard. They are cited only to describ
 
 ## Contact
 
-[Name] · [email] · [LinkedIn]
+[Name] آ· [email] آ· [LinkedIn]
