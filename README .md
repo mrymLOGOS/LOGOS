@@ -1,3 +1,4 @@
+
 # LOGOS
 
 **An early-stage guardian layer that tries to notice when an autonomous system faces something it has never seen, or is drifting toward failure, explain why in plain language, and leave the decision to a human.**
@@ -18,7 +19,7 @@ LOGOS sits next to a driving system and keeps asking two questions: "Do I recogn
 4. **Explain:** a plain-language report says what was flagged and why.
 5. **Hand over:** a person confirms the next step while LOGOS suggests a cautious action.
 
-Current status: Sense and Doubt are built and tested (prototypes 1 and 2). Anticipate is tested in simulation and on NASA engine data (prototypes 3 and 4). Explain is a text report on the engine data. Hand over is a simulated approve/reject prompt only.
+Current status: Sense and Doubt are built and tested (prototypes 1 and 2). Anticipate is tested in simulation and on NASA engine data (prototypes 3 and 4). Prototype 5 tests whether the system can tell when its own warnings cannot be trusted. Explain is a text report on the engine data. Hand over is a simulated approve/reject prompt only.
 
 ## Experiments and results
 
@@ -73,6 +74,27 @@ NASA turbofan engine degradation data (a NASA simulation of jet engines, not car
 
 The notebook also prints an alert report: score, the three sensors that pushed it up, how far they are from early-life values, suggested action, limits, and a human approve/reject prompt (which only records the answer).
 
+### Prototype 5: does the guardian know what it does not know? (NASA C-MAPSS)
+
+The warning model is trained on one NASA dataset only, then meets another. Four pairs, 3 random splits each. The "do I recognise this?" check is a nearest-neighbour distance to the training data, used live (only data up to the current cycle); its rule is fixed on known engines that were not used for training.
+
+| learns -> meets | engines missed by the warning model | missed ones flagged unfamiliar | flagged at least 60 cycles early | warned engines flagged | known engines flagged |
+|---|---|---|---|---|---|
+| FD001 -> FD003 | 44 of 100 | 100% (100 to 100) | 99% | 3% | 5% |
+| FD003 -> FD001 | 0 of 100 | n/a | n/a | 3% | 5% |
+| FD002 -> FD004 | 101 of 249 | 8% (5 to 12) | 4% | 2% | 3% |
+| FD004 -> FD002 | 0 of 260 | n/a | n/a | 4% | 3% |
+
+Reading:
+- The warning model **stays silent** on engines with an unseen fault type (44 of 100 missed on FD003) instead of raising false alarms. That silence is a real risk.
+- On the single-condition pair (FD001 to FD003) the familiarity check flagged every missed engine, almost all at least 60 cycles before failure, with about 3% to 5% flags on engines that did not need it. LOGOS can then say: "I do not recognise how this engine is behaving. My silence is not a good sign. A human must check."
+- On the six-condition pair (FD002 to FD004) the check **fails** (8%) while the warning model misses 40% of engines. Hypothesis, not tested: raw sensor values are dominated by changing operating conditions. Normalising per operating condition is the next step.
+- In two pairs the warning model missed nothing, so there was nothing to detect.
+
+History, for honesty: an earlier version computed the distance cut on training rows, which are also the check's reference points, and it gave a misleading result (0% flagged in the repeated test). The corrected version above fixes this.
+
+Cautions: NASA simulations of jet engines, not cars; no per-engine fault labels exist, so what the check reacts to is unverified; calibration sets are small. Detecting unfamiliar inputs and predicting failure are established fields; what is tested here is the combination with a human in the loop.
+
 ## Limitations
 
 - Offline testing only. No real driving footage, no live vehicle. Prototype 4 data is a NASA simulation of jet engines.
@@ -86,7 +108,7 @@ The notebook also prints an alert report: score, the three sensors that pushed i
 
 1. Real driving data: check whether the gains hold on real road imagery and real vehicle logs.
 2. Harder unknowns: unfamiliar objects that resemble familiar ones.
-3. More engine data (FD003, FD004) and confidence intervals on the comparison.
+3. Other dataset pairs for prototype 5 (FD001 to FD002 and FD004, and the reverse), repeats, and confidence intervals.
 4. Fleet layer: one vehicle's alert reaches the others in a simulation.
 5. Plain-language layer with a language model, checked against the evidence behind each alert.
 
@@ -98,14 +120,15 @@ notebooks/
   LOGOS_prototype_2_road_signs.ipynb      road-sign experiment (needs a GPU)
   LOGOS_prototype_3_failure_path.ipynb    failure-path simulation (CPU)
   LOGOS_prototype_4_real_engines.ipynb    NASA engine data + readable report (CPU)
+  LOGOS_prototype_5_knows_its_limits.ipynb  silent misses and a live 'do I recognise this?' check (CPU)
 README.md
 ```
 
 ## How to run
 
 1. Open a notebook in Google Colab (File > Upload notebook, or open from GitHub).
-2. For prototype 2, set Runtime > Change runtime type > T4 GPU. Prototypes 1, 3 and 4 run on CPU.
-3. Run all cells in order. Approximate times: prototype 1 about a minute, prototype 2 25 to 40 minutes, prototype 3 a few minutes, prototype 4 a few minutes.
+2. For prototype 2, set Runtime > Change runtime type > T4 GPU. Prototypes 1, 3, 4 and 5 run on CPU.
+3. Run all cells in order. Approximate times: prototype 1 about a minute, prototype 2 25 to 40 minutes, prototype 3 a few minutes, prototypes 4 and 5 a few minutes per step.
 
 Dependencies: numpy, pandas, matplotlib, scikit-learn, PyTorch, torchvision (all preinstalled in Colab).
 
@@ -120,4 +143,4 @@ LOGOS has not been assessed against any standard. They are cited only to describ
 
 ## Contact
 
-[Name] · [email] · [LinkedIn]
+[Name] آ· [email] آ· [LinkedIn]
