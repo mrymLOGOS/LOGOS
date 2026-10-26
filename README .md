@@ -114,15 +114,12 @@ Cautions: NASA simulations of jet engines, not cars; no per-engine fault labels 
 
 ## Repository layout
 
-```
-notebooks/
-  LOGOS_prototype_1_digits.ipynb          digits experiment
-  LOGOS_prototype_2_road_signs.ipynb      road-sign experiment (needs a GPU)
-  LOGOS_prototype_3_failure_path.ipynb    failure-path simulation (CPU)
-  LOGOS_prototype_4_real_engines.ipynb    NASA engine data + readable report (CPU)
-  LOGOS_prototype_5_knows_its_limits.ipynb  silent misses and a live 'do I recognise this?' check (CPU)
+LOGOS_prototype_1_digits.ipynb            digits experiment
+LOGOS_prototype_2_road_signs.ipynb        road-sign experiment (needs a GPU)
+LOGOS_prototype_3_failure_path.ipynb      failure-path simulation (CPU)
+LOGOS_prototype_4_real_engines.ipynb      NASA engine data + readable report (CPU)
+LOGOS_prototype_5_knows_its_limits.ipynb  silent misses and a live "do I recognise this?" check (CPU)
 README.md
-```
 
 ## How to run
 
